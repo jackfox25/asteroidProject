@@ -1,4 +1,4 @@
-function xdot = satDynamicModel(t,x,processNoise)
+function xdot = satDynamicModel(t,x,u,processNoise)
 
     simParameters;
     r = x(1:3); rmag = norm(r);

@@ -17,7 +17,7 @@ OPTIONS = odeset('RelTol',3*tol,'AbsTol',tol);
 % Numerically integrate from initial condition to get state history
 x0 = [r0; rdot0];
 processNoise = zeros(3,1);
-[t,X] = ode45(@satDynamicModel,tspan,x0,OPTIONS,processNoise);
+[t,X] = ode45(@(t,x) satDynamicModel(t,x,[],processNoise),tspan,x0,OPTIONS);
 
 
 % Perfect measurement derivation
