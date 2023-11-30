@@ -1,5 +1,6 @@
 mu_A = 4.892e-9;                      % [km3/s2]   (Asteroid gravitational parameter)
-T_A = 4.296057;                       % [hr]       (Asteroid rotation period)
+T_A = 4.296057 * 3600;                % [s]        (Asteroid rotation period)
+w_A = 2*pi/T_A;                       % [rad/s]    (Asteroid rotation rate)
 r_S = [1.5e8 0 0]';                   % [km]       (Inertial Sun position w.r.t. asteroid center (1 AU)
 SPC = 1e14;                           % [kgkm/s2]  (Solar pressure constant)
 rho = 0.4;                            %            (Coefficient of reflectivity)

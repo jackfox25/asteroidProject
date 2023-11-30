@@ -4,16 +4,65 @@
 clear; clc; close all;
 ANIMATE_FLAG = false;
 
+% Load data and parameters
 load('orbitdetermination-finalproj_data_2023_11_14.mat');
-simParameters; % load in constants
+Nlmks = size(pos_lmks_A,2);
+simParameters;
 
+% Configure integration time and tolerances
 tspan = t0:dt_int:tf;
 tol=1.e-14;
 OPTIONS = odeset('RelTol',3*tol,'AbsTol',tol);
 
+% Numerically integrate from initial condition to get state history
 x0 = [r0; rdot0];
 processNoise = zeros(3,1);
 [t,X] = ode45(@satDynamicModel,tspan,x0,OPTIONS,processNoise);
+
+
+% Perfect measurement derivation
+y_table_ideal = [];
+
+obsvTimes = unique(y_table(:,1));
+for t_k = obsvTimes' % For each observation timestep
+    
+    % Recover s/c position vector, define khatC vector (cam nadir pointing)
+    satpos_k_N = X(find(t==t_k),1:3)';          % satellite position in inertial frame
+    khatC_k_N = -satpos_k_N/norm(satpos_k_N);   % unit vector of camera pointing axis in inertial frame
+    
+    % Get rotation matrix R_CtoN
+    R_CtoN_k = R_CtoN(:,:,(t_k/dt_obs)+1); % this is questionable
+    ihatC_k_N = R_CtoN_k(:,1); jhatC_k_N = R_CtoN_k(:,2);
+
+    % Get rotation matrix R_AtoN
+    theta = w_A*t_k;
+    R_AtoN_k = rotZ(theta);
+
+    for i = 1:Nlmks % For each landmark
+       
+       % Get landmark position in intertial frame
+        lmkipos_k_A = pos_lmks_A(:,i);
+        lmkipos_k_N = R_AtoN_k*lmkipos_k_A;
+        disttolmk_k_N = lmkipos_k_N - satpos_k_N;
+
+       % Simulate ideal measurement
+        u_i = f * dot(disttolmk_k_N',ihatC_k_N) / dot(disttolmk_k_N',khatC_k_N) + u0;
+        v_i = f * dot(disttolmk_k_N',jhatC_k_N) / dot(disttolmk_k_N',khatC_k_N) + v0;
+
+       % Check whether landmark is in camera FOV
+        if u_i >= 0 && u_i <= umax && dot(disttolmk_k_N',khatC_k_N) > 0
+           % Check whether landmark is facing satellite
+            if dot(lmkipos_k_N',khatC_k_N) < 0
+               % If so, append [timestamp  lmk_id  u   v] to y_table_ideal
+                y_table_ideal = [y_table_ideal;...
+                                 t_k i u_i v_i]; %#ok<*AGROW> 
+            end
+        end
+
+    end
+
+end
+
 
 % Position state history
 posStateHist = figure;
@@ -87,3 +136,4 @@ for k=1:length(tspan)
 
     pause(0.1);
 end
+
