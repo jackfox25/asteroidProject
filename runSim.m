@@ -46,11 +46,11 @@ for t_k = obsvTimes' % For each observation timestep
         disttolmk_k_N = lmkipos_k_N - satpos_k_N;
 
        % Simulate ideal measurement
-        u_i = f * dot(disttolmk_k_N',ihatC_k_N) / dot(disttolmk_k_N',khatC_k_N) + u0;
-        v_i = f * dot(disttolmk_k_N',jhatC_k_N) / dot(disttolmk_k_N',khatC_k_N) + v0;
+        u_i = f * (disttolmk_k_N'*ihatC_k_N) / (disttolmk_k_N'*khatC_k_N) + u0;
+        v_i = f * (disttolmk_k_N'*jhatC_k_N) / (disttolmk_k_N'*khatC_k_N) + v0;
 
        % Check whether landmark is in camera FOV
-        if u_i >= 0 && u_i <= umax && dot(disttolmk_k_N',khatC_k_N) > 0
+        if u_i >= 0 && u_i <= umax && (disttolmk_k_N'*khatC_k_N) > 0
            % Check whether landmark is facing satellite
             if dot(lmkipos_k_N',khatC_k_N) < 0
                % If so, append [timestamp  lmk_id  u   v] to y_table_ideal
