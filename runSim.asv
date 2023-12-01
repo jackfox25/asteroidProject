@@ -2,7 +2,7 @@
 % Noiseless nonlinear simulation
 
 clear; clc; close all;
-ANIMATE_FLAG = true;
+ANIMATE_FLAG = false;
 
 % Load data and parameters
 load('orbitdetermination-finalproj_data_2023_11_14.mat');
@@ -46,11 +46,11 @@ for t_k = obsvTimes' % For each observation timestep
         disttolmk_k_N = lmkipos_k_N - satpos_k_N;
 
        % Simulate ideal measurement
-        u_i = f * (disttolmk_k_N'*ihatC_k_N) / (disttolmk_k_N'*khatC_k_N) + u0;
-        v_i = f * (disttolmk_k_N'*jhatC_k_N) / (disttolmk_k_N'*khatC_k_N) + v0;
+        u_i = f * dot(disttolmk_k_N',ihatC_k_N) / dot(disttolmk_k_N',khatC_k_N) + u0;
+        v_i = f * dot(disttolmk_k_N',jhatC_k_N) / dot(disttolmk_k_N',khatC_k_N) + v0;
 
        % Check whether landmark is in camera FOV
-        if u_i >= 0 && u_i <= umax && (disttolmk_k_N'*khatC_k_N) > 0
+        if u_i >= 0 && u_i <= umax && dot(disttolmk_k_N',khatC_k_N) > 0
            % Check whether landmark is facing satellite
             if dot(lmkipos_k_N',khatC_k_N) < 0
                % If so, append [timestamp  lmk_id  u   v] to y_table_ideal
@@ -141,7 +141,7 @@ zlmks = pos_lmks_A(3,:);
 bennusurf = trisurf(k1,xlmks,ylmks,zlmks,'FaceColor',[0.4 0.4 0.4]); hold on;
 set(gca,'Color',[0 0 0]);
 axis vis3d; ax = gca;
-material shiny; light('Position',[1.5e8,0,0]);
+material dull; light('Position',[1.5e8,0,0]);
 
 % == Plot landmarks ==
 lmks = plot3(pos_lmks_A(1,:),pos_lmks_A(2,:),pos_lmks_A(3,:),'c.','MarkerSize',18);
