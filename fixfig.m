@@ -5,7 +5,7 @@ function fixfig(f)
     legloc = 'northeast';         % 'northwest', 'southeast', etc. legend can also be dragged after plot is created.
     linewidth = 2.5;                % scale up or down as necessary.
     marker = [];                  % replace brackets with '.', 'o', 'x' etc. to change the marker for each point. brackets leaves it alone.
-    markersize = 20;              % scale up or down as necessary.
+    markersize = [];              % scale up or down as necessary.
 
     for i=1:length(f.Children)
         if isa(f.Children(i),'matlab.graphics.illustration.Legend')
