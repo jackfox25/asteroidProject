@@ -3,42 +3,42 @@
 % =================================================================== %
 %                              Part 1.1                               %
 % =================================================================== %
-    % Noiseless nonlinear simulation
+   % Noiseless nonlinear simulation
     
     clear; clc; close all;
     addpath('toolbox');
     
-    % Load data and parameters
+   % Load data and parameters
     load('orbitdetermination-finalproj_data_2023_11_14.mat');
     Nlmks = size(pos_lmks_A,2);
     simParameters;
     
-    % Configure integration time and tolerances
+   % Configure integration time and tolerances
     tspan = t0:dt_int:tf;
     tol=1.e-14;
     OPTIONS = odeset('RelTol',3*tol,'AbsTol',tol);
     
-    % Numerically integrate from initial condition to get state history
+   % Numerically integrate from initial condition to get state history
     x0 = [r0; rdot0];
     processNoise = zeros(3,1);
     [t_nom,x_nom] = ode45(@(t,x) satDynamicModel(t,x,[],processNoise),tspan,x0,OPTIONS);
     
     
-    % Perfect measurement derivation
+   % Perfect measurement derivation
     y_nom = [];
     
     obsvTimes = unique(y_table(:,1))';
     for t_k = obsvTimes % For each observation timestep
         
-        % Recover s/c position vector, define khatC vector (cam nadir pointing)
-        satpos_k_N = x_nom(find(t_nom==t_k),1:3)';          % satellite position in inertial frame
-        khatC_k_N = -satpos_k_N/norm(satpos_k_N);   % unit vector of camera pointing axis in inertial frame
+       % Recover s/c position vector, define khatC vector (cam nadir pointing)
+        satpos_k_N = x_nom((t_nom==t_k)~=0,1:3)';    % satellite position in inertial frame
+        khatC_k_N = -satpos_k_N/norm(satpos_k_N);    % unit vector of camera pointing axis in inertial frame
         
-        % Get rotation matrix R_CtoN
+       % Get rotation matrix R_CtoN
         R_CtoN_k = R_CtoN(:,:,(t_k/dt_obs)+1);
         ihatC_k_N = R_CtoN_k(:,1); jhatC_k_N = R_CtoN_k(:,2);
     
-        % Get rotation matrix R_AtoN
+       % Get rotation matrix R_AtoN
         theta = w_A*t_k;
         R_AtoN_k = rotZ(theta);
     
@@ -67,7 +67,7 @@
     
     end
     
-    % Position state history
+   % Position state history
     posStateHist = figure;
     subplot(3,1,1);
     plot(t_nom,x_nom(:,1),'Color',mlc(1),'DisplayName','$x$');
@@ -80,7 +80,7 @@
     labels(gca,{'Time [s]','z [km]'},'');
     fixfig(posStateHist);
     
-    % Velocity state history
+   % Velocity state history
     velStateHist = figure;
     subplot(3,1,1);
     plot(t_nom,x_nom(:,4),'Color',mlc(1),'DisplayName','$\dot{x}$');
@@ -95,7 +95,7 @@
     %%
     markers = {'o','+','*','<','x','s','d','v','^','>'};
     
-    % Plot the landmark u pixel measurements
+   % Plot the landmark u pixel measurements
     u_fig = figure;
     for i = 1:10
         % Find rows where the second column is equal to i
@@ -112,7 +112,7 @@
     labels(gca,{'Time [s]','u [px]'},'Horizontal Pixel Position of 10 Landmarks (Ideal Measurements)')
     fixfig(u_fig);
     
-    % Plot the landmark v pixel measurements
+   % Plot the landmark v pixel measurements
     v_fig = figure; 
     for i = 1:10
         % Find rows where the second column is equal to i
@@ -154,12 +154,12 @@
 %                              Part 1.4                               %
 % =================================================================== %
 
-    % Simulation of linearized DT dynamics, using initial state perturbation.
+   % Simulation of linearized DT dynamics, using initial state perturbation.
     r_pert = 1.e-5 * [1; 1; 1]; % km
     rdot_pert = 1.e-7 * [1; 1; 1]; % km/s
     x0_pert = [r_pert; rdot_pert];
     
-    % Set up container to store DT state history
+   % Set up container to store DT state history
     xbar_hist = zeros(length(tspan),6);
     xbar_hist(1,:) = x0_pert';
     
@@ -169,14 +169,14 @@
         xbar_hist(i+1,:) = (Fbar_k*xbar_hist(i,:)')';  % Propagate, save
     end
     
-    % Run another ode45 sim, but this time using the perturbed initial condition 
+   % Run another ode45 sim, but this time using the perturbed initial condition 
     processNoise = zeros(3,1);
     [t_pert,x_pert] = ode45(@(t,x) satDynamicModel(t,x,[],processNoise),tspan,x0+x0_pert,OPTIONS);
     
     
-    % Error plots
+   % Error plots
     if true
-        % Position error state history
+       % Position error state history
         eposStateHist = figure;
         subplot(3,1,1);
         plot(tspan,xbar_hist(:,1),'Color',mlc(1),'DisplayName','$x$');
@@ -189,7 +189,7 @@
         labels(gca,{'Time [s]','z [km]'},'');
         fixfig(eposStateHist);
         
-        % Velocity error state history
+       % Velocity error state history
         evelStateHist = figure;
         subplot(3,1,1);
         plot(tspan,xbar_hist(:,4),'Color',mlc(1),'DisplayName','$\dot{x}$');
@@ -204,7 +204,7 @@
     end
     
     
-    % Position: [NOM + ERR] & [NL]
+   % Position: [NOM + ERR] & [NL]
     neposStateHist = figure;
     
     subplot(3,1,1);
@@ -224,7 +224,7 @@
     
     fixfig(neposStateHist);
     
-    % Velocity: [NOM + ERR] & [NL]
+   % Velocity: [NOM + ERR] & [NL]
     nevelStateHist = figure;
     subplot(3,1,1);
     plot(tspan,xbar_hist(:,4)+x_nom(:,4),'Color',mlc(1),'DisplayName','$\delta \dot{x}+\dot{x}_{nom}$'); hold on;
@@ -244,9 +244,9 @@
     fixfig(nevelStateHist);
     
     
-    % Simulate linearized measurements
+   % Simulate linearized measurements
     
-    % TODO
+   % TODO
     
     
     
