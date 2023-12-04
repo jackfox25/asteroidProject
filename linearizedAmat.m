@@ -16,12 +16,12 @@ function Abar_k = linearizedAmat(mu_A, x_nom_k)
     x1 = pos_k(1); x2 = pos_k(2); x3 = pos_k(3);
 
     % Define common denominator for bottom left block
-    cd = (pos_k'*pos_k)^(3/2); 
+    cd = (x1^2 + x2^2 + x3^2)^(5/2); 
 
     % Create bottom left block of Abar first
-    accelTerms = -mu_A/cd*[x2^2 + x3^2     x1*x2           x1*x3;...
-                           x1*x2           x1^2 + x3^2     x2*x3;...
-                           x1*x3           x2*x3           x1^2+x2^2];
+    accelTerms = mu_A/cd*[2*x1^2 - x2^2 - x3^2   3*x1*x2                 3*x1*x3;...
+                          3*x1*x2                2*x2^2 - x1^2 - x3^2    3*x2*x3;...
+                          3*x1*x3                3*x2*x3                 2*x3^2 - x1^2 - x2^2];
 
     % Assemble
     Abar_k = [zeros(3)     eye(3);...

@@ -71,7 +71,7 @@
     posStateHist = figure;
     subplot(3,1,1);
     plot(t_nom,x_nom(:,1),'Color',mlc(1),'DisplayName','$x$');
-    labels(gca,{'Time [s]','x [km]'},'Position State History');
+    labels(gca,{'Time [s]','x [km]'},'NL Nominal Position State History');
     subplot(3,1,2);
     plot(t_nom,x_nom(:,2),'Color',mlc(2),'DisplayName','$y$');
     labels(gca,{'Time [s]','y [km]'},'');
@@ -84,7 +84,7 @@
     velStateHist = figure;
     subplot(3,1,1);
     plot(t_nom,x_nom(:,4),'Color',mlc(1),'DisplayName','$\dot{x}$');
-    labels(gca,{'Time [s]','$\mathrm{\dot{x}}$ [km/s]'},'Velocity State History');
+    labels(gca,{'Time [s]','$\mathrm{\dot{x}}$ [km/s]'},'NL Nominal Velocity State History');
     subplot(3,1,2);
     plot(t_nom,x_nom(:,5),'Color',mlc(2),'DisplayName','$\dot{y}$');
     labels(gca,{'Time [s]','$\mathrm{\dot{y}}$ [km/s]'},'');
@@ -155,8 +155,8 @@
 % =================================================================== %
 
     % Simulation of linearized DT dynamics, using initial state perturbation.
-    r_pert = [0; 0.01; 0]; % km
-    rdot_pert = 1.e-5 * [0.1; 0; 0]; % km/s
+    r_pert = 1.e-5 * [1; 1; 1]; % km
+    rdot_pert = 1.e-7 * [1; 1; 1]; % km/s
     x0_pert = [r_pert; rdot_pert];
     
     % Set up container to store DT state history
