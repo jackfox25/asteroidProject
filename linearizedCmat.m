@@ -37,12 +37,12 @@ function Cbar_k = linearizedCmat(f, R_CtoN_k, pos_lmks_N, y_nom_k, x_nom_k)
         cf = f / ( (lmkj_pos_k_N - xpos_k_nom)'*khat )^2;
 
         % Create each component of Cbar_k_j
-        Cbar_k_j_11 = cf*[-k2*(l2-x2)-k3*(l3-x3); k1*(l2-x2); k1*(l3-x3)]*ihat;
-        Cbar_k_j_21 = cf*[-k2*(l2-x2)-k3*(l3-x3); k1*(l2-x2); k1*(l3-x3)]*jhat;
-        Cbar_k_j_12 = cf*[k2*(l1-x1); -k1*(l1-x1)-k3*(l3-x3); k2*(l3-x3)]*ihat;
-        Cbar_k_j_22 = cf*[k2*(l1-x1); -k1*(l1-x1)-k3*(l3-x3); k2*(l3-x3)]*jhat;
-        Cbar_k_j_13 = cf*[k3*(l1-x1); k3*(l2-x2); -k1*(l1-x1)-k2*(l1-x2)]*ihat;
-        Cbar_k_j_23 = cf*[k3*(l1-x1); k3*(l2-x2); -k1*(l1-x1)-k2*(l2-x2)]*jhat;
+        Cbar_k_j_11 = cf*[-k2*(l2-x2)-k3*(l3-x3); k1*(l2-x2); k1*(l3-x3)]'*ihat;
+        Cbar_k_j_21 = cf*[-k2*(l2-x2)-k3*(l3-x3); k1*(l2-x2); k1*(l3-x3)]'*jhat;
+        Cbar_k_j_12 = cf*[k2*(l1-x1); -k1*(l1-x1)-k3*(l3-x3); k2*(l3-x3)]'*ihat;
+        Cbar_k_j_22 = cf*[k2*(l1-x1); -k1*(l1-x1)-k3*(l3-x3); k2*(l3-x3)]'*jhat;
+        Cbar_k_j_13 = cf*[k3*(l1-x1); k3*(l2-x2); -k1*(l1-x1)-k2*(l2-x2)]'*ihat;
+        Cbar_k_j_23 = cf*[k3*(l1-x1); k3*(l2-x2); -k1*(l1-x1)-k2*(l2-x2)]'*jhat;
 
         % Assemble
         Cbar_k_j = [Cbar_k_j_11 Cbar_k_j_12 Cbar_k_j_13 0 0 0;...

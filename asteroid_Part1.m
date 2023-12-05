@@ -25,7 +25,7 @@
     
     
    % Perfect measurement derivation
-    y_nom = [];
+    y_nom_tbl = [];
     
     obsvTimes = unique(y_table(:,1))';
     for t_k = obsvTimes % For each observation timestep
@@ -56,9 +56,9 @@
            % Check whether landmark is in camera FOV
             if u_i >= 0 && u_i <= umax && v_i >= 0 && v_i <= vmax && (disttolmk_k_N'*khatC_k_N) > 0
                % Check whether landmark is facing satellite
-                if dot(lmkipos_k_N',khatC_k_N) < 0
+                if (lmkipos_k_N'*khatC_k_N) < 0
                    % If so, append [timestamp  lmk_id  u   v] to y_table_ideal
-                    y_nom = [y_nom;...
+                    y_nom_tbl = [y_nom_tbl;...
                              t_k i u_i v_i]; %#ok<*AGROW>   <--- suppresses size change warning
                 end
             end
@@ -99,34 +99,34 @@
     u_fig = figure;
     for i = 1:10
         % Find rows where the second column is equal to i
-        landmark_indices = find(y_nom(:, 2) == i);
+        landmark_indices = find(y_nom_tbl(:, 2) == i);
         landmark_id_string = sprintf('Lmk #%d', i);
     
-        time_vis = y_nom(landmark_indices, 1);
-        u_loc = y_nom(landmark_indices, 3);
+        time_vis = y_nom_tbl(landmark_indices, 1);
+        u_loc = y_nom_tbl(landmark_indices, 3);
         plot(time_vis, u_loc, '.', 'DisplayName', landmark_id_string, 'Marker', markers{i});
     
         hold on;
     end
     legend;
-    labels(gca,{'Time [s]','u [px]'},'Horizontal Pixel Position of 10 Landmarks (Ideal Measurements)')
+    labels(gca,{'Time [s]','u [px]'},'Horizontal Nominal Pixel Position of 10 Landmarks')
     fixfig(u_fig);
     
    % Plot the landmark v pixel measurements
     v_fig = figure; 
     for i = 1:10
         % Find rows where the second column is equal to i
-        landmark_indices = find(y_nom(:, 2) == i);
+        landmark_indices = find(y_nom_tbl(:, 2) == i);
         landmark_id_string = sprintf('Lmk #%d', i);
     
-        time_vis = y_nom(landmark_indices, 1);
-        v_loc = y_nom(landmark_indices, 4);
+        time_vis = y_nom_tbl(landmark_indices, 1);
+        v_loc = y_nom_tbl(landmark_indices, 4);
         plot(time_vis, v_loc, '.', 'DisplayName', landmark_id_string, 'Marker', markers{i});
     
         hold on;
     end
     legend;
-    labels(gca,{'Time [s]','v [px]'},'Vertical Pixel Position of 10 Landmarks (Ideal Measurements)')
+    labels(gca,{'Time [s]','v [px]'},'Vertical Nominal Pixel Position of 10 Landmarks')
     fixfig(v_fig);
 
 
@@ -160,13 +160,13 @@
     x0_pert = [r_pert; rdot_pert];
     
    % Set up container to store DT state history
-    xbar_hist = zeros(length(tspan),6);
-    xbar_hist(1,:) = x0_pert';
+    xbar = zeros(length(tspan),6);
+    xbar(1,:) = x0_pert';
     
     for i=1:length(tspan)-1    
         Abar_k = linearizedAmat(mu_A, x_nom(i,:)'); % CT
         Fbar_k = linearizedFmat(dt_int, Abar_k);    % ... to DT
-        xbar_hist(i+1,:) = (Fbar_k*xbar_hist(i,:)')';  % Propagate, save
+        xbar(i+1,:) = (Fbar_k*xbar(i,:)')';  % Propagate, save
     end
     
    % Run another ode45 sim, but this time using the perturbed initial condition 
@@ -179,26 +179,26 @@
        % Position error state history
         eposStateHist = figure;
         subplot(3,1,1);
-        plot(tspan,xbar_hist(:,1),'Color',mlc(1),'DisplayName','$x$');
+        plot(tspan,xbar(:,1),'Color',mlc(1),'DisplayName','$x$');
         labels(gca,{'Time [s]','x [km]'},'Position Error State History');
         subplot(3,1,2);
-        plot(tspan,xbar_hist(:,2),'Color',mlc(2),'DisplayName','$y$');
+        plot(tspan,xbar(:,2),'Color',mlc(2),'DisplayName','$y$');
         labels(gca,{'Time [s]','y [km]'},'');
         subplot(3,1,3);
-        plot(tspan,xbar_hist(:,3),'Color',mlc(3),'DisplayName','$z$');
+        plot(tspan,xbar(:,3),'Color',mlc(3),'DisplayName','$z$');
         labels(gca,{'Time [s]','z [km]'},'');
         fixfig(eposStateHist);
         
        % Velocity error state history
         evelStateHist = figure;
         subplot(3,1,1);
-        plot(tspan,xbar_hist(:,4),'Color',mlc(1),'DisplayName','$\dot{x}$');
+        plot(tspan,xbar(:,4),'Color',mlc(1),'DisplayName','$\dot{x}$');
         labels(gca,{'Time [s]','$\mathrm{\dot{x}}$ [km/s]'},'Velocity Error State History');
         subplot(3,1,2);
-        plot(tspan,xbar_hist(:,5),'Color',mlc(2),'DisplayName','$\dot{y}$');
+        plot(tspan,xbar(:,5),'Color',mlc(2),'DisplayName','$\dot{y}$');
         labels(gca,{'Time [s]','$\mathrm{\dot{y}}$ [km/s]'},'');
         subplot(3,1,3);
-        plot(tspan,xbar_hist(:,6),'Color',mlc(3),'DisplayName','$\dot{z}$');
+        plot(tspan,xbar(:,6),'Color',mlc(3),'DisplayName','$\dot{z}$');
         labels(gca,{'Time [s]','$\mathrm{\dot{z}}$ [km/s]'},'');
         fixfig(evelStateHist);
     end
@@ -208,17 +208,17 @@
     neposStateHist = figure;
     
     subplot(3,1,1);
-    plot(tspan,xbar_hist(:,1)+x_nom(:,1),'Color',mlc(1),'DisplayName','$\delta x+x_{nom}$'); hold on;
+    plot(tspan,xbar(:,1)+x_nom(:,1),'Color',mlc(1),'DisplayName','$\delta x+x_{nom}$'); hold on;
     plot(t_pert,x_pert(:,1),'--','Color','k','DisplayName','$x_{NL}$');
-    labels(gca,{'Time [s]','x [km]'},'Position Error State History'); legend('interpreter','latex');
+    labels(gca,{'Time [s]','x [km]'},'Full-State Linear vs. Non-Linear Position History'); legend('interpreter','latex');
     
     subplot(3,1,2);
-    plot(tspan,xbar_hist(:,2)+x_nom(:,2),'Color',mlc(2),'DisplayName','$\delta y+y_{nom}$'); hold on;
+    plot(tspan,xbar(:,2)+x_nom(:,2),'Color',mlc(2),'DisplayName','$\delta y+y_{nom}$'); hold on;
     plot(t_pert,x_pert(:,2),'--','Color','k','DisplayName','$y_{NL}$');
     labels(gca,{'Time [s]','y [km]'},''); legend('interpreter','latex');
     
     subplot(3,1,3);
-    plot(tspan,xbar_hist(:,3)+x_nom(:,3),'Color',mlc(3),'DisplayName','$\delta z+z_{nom}$'); hold on;
+    plot(tspan,xbar(:,3)+x_nom(:,3),'Color',mlc(3),'DisplayName','$\delta z+z_{nom}$'); hold on;
     plot(t_pert,x_pert(:,3),'--','Color','k','DisplayName','$z_{NL}$')
     labels(gca,{'Time [s]','z [km]'},''); legend('interpreter','latex');
     
@@ -227,30 +227,90 @@
    % Velocity: [NOM + ERR] & [NL]
     nevelStateHist = figure;
     subplot(3,1,1);
-    plot(tspan,xbar_hist(:,4)+x_nom(:,4),'Color',mlc(1),'DisplayName','$\delta \dot{x}+\dot{x}_{nom}$'); hold on;
+    plot(tspan,xbar(:,4)+x_nom(:,4),'Color',mlc(1),'DisplayName','$\delta \dot{x}+\dot{x}_{nom}$'); hold on;
     plot(t_pert,x_pert(:,4),'--','Color','k','DisplayName','$\dot{x}_{NL}$');
-    labels(gca,{'Time [s]','$\mathrm{\dot{x}}$ [km/s]'},'Velocity Error State History'); legend('interpreter','latex');
+    labels(gca,{'Time [s]','$\mathrm{\dot{x}}$ [km/s]'},'Full-State Linear vs. Non-Linear Velocity History'); legend('interpreter','latex');
     
     subplot(3,1,2);
-    plot(tspan,xbar_hist(:,5)+x_nom(:,5),'Color',mlc(2),'DisplayName','$\delta \dot{y}+\dot{y}_{nom}$'); hold on;
+    plot(tspan,xbar(:,5)+x_nom(:,5),'Color',mlc(2),'DisplayName','$\delta \dot{y}+\dot{y}_{nom}$'); hold on;
     plot(t_pert,x_pert(:,5),'--','Color','k','DisplayName','$\dot{y}_{NL}$');
     labels(gca,{'Time [s]','$\mathrm{\dot{y}}$ [km/s]'},''); legend('interpreter','latex');
     
     subplot(3,1,3);
-    plot(tspan,xbar_hist(:,6)+x_nom(:,6),'Color',mlc(3),'DisplayName','$\delta \dot{z}+\dot{z}_{nom}$'); hold on;
+    plot(tspan,xbar(:,6)+x_nom(:,6),'Color',mlc(3),'DisplayName','$\delta \dot{z}+\dot{z}_{nom}$'); hold on;
     plot(t_pert,x_pert(:,6),'--','Color','k','DisplayName','$\dot{z}_{NL}$');
     labels(gca,{'Time [s]','$\mathrm{\dot{z}}$ [km/s]'},''); legend('interpreter','latex');
     
     fixfig(nevelStateHist);
     
     
-   % Simulate linearized measurements
+   %% Simulate linearized measurements
+    ybar = [];
+
+    for t_k=obsvTimes
+        
+       % Get rotation matrix R_CtoN_k
+        R_CtoN_k = R_CtoN(:,:,(t_k/dt_obs)+1);
     
-   % TODO
+       % Get rotation matrix R_AtoN_k, rotate landmark position vectors
+        theta_k = w_A*t_k;
+        R_AtoN_k = rotZ(theta_k);
+        pos_lmks_N = R_AtoN_k*pos_lmks_A;
+
+       % Get nominal measurements at time k
+        y_nom_tbl_k = y_nom_tbl((y_nom_tbl(:,1)==t_k)~=0,:);
+
+       % Recover nominal s/c state vector at time k
+        x_nom_k = x_nom((t_nom==t_k)~=0,:)';
+        xbar_k = xbar((t_pert==t_k)~=0,:)';
+
+
+       % Calculate CT jacobian, translate to DT
+        Cbar_k = linearizedCmat(f, R_CtoN_k, pos_lmks_N, y_nom_tbl_k, x_nom_k);
+        Hbar_k = linearizedHmat(Cbar_k);
+
+        ybar_k = Hbar_k*xbar_k;
+        ybar_k = reshape(ybar_k,[2,length(ybar_k)/2])';
+
+        ybar = [ybar; ybar_k];
+        
+    end
     
+    ybar_tbl = [y_nom_tbl(:,1:2) ybar];
     
+    % Plot the landmark u pixel measurements
+    u_fig = figure;
+    for i = 1
+        % Find rows where the second column is equal to i
+        landmark_indices = find(ybar_tbl(:, 2) == i);
+        landmark_id_string = sprintf('Lmk #%d', i);
     
+        time_vis = ybar_tbl(landmark_indices, 1);
+        u_loc = ybar_tbl(landmark_indices, 3);
+        plot(time_vis, u_loc, '.', 'DisplayName', landmark_id_string, 'Marker', markers{i});
     
+        hold on;
+    end
+    legend;
+    labels(gca,{'Time [s]','u [px]'},'Horizontal Pixel Position Error of 1 Landmark')
+    fixfig(u_fig);
+    
+   % Plot the landmark v pixel measurements
+    v_fig = figure; 
+    for i = 1
+        % Find rows where the second column is equal to i
+        landmark_indices = find(ybar_tbl(:, 2) == i);
+        landmark_id_string = sprintf('Lmk #%d', i);
+    
+        time_vis = ybar_tbl(landmark_indices, 1);
+        v_loc = ybar_tbl(landmark_indices, 4);
+        plot(time_vis, v_loc, '.', 'DisplayName', landmark_id_string, 'Marker', markers{i});
+    
+        hold on;
+    end
+    legend;
+    labels(gca,{'Time [s]','v [px]'},'Vertical Pixel Position Error of 1 Landmark')
+    fixfig(v_fig);
     
     
     
