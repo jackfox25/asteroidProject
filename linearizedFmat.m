@@ -11,6 +11,6 @@
 % =================================================================================================
 function Fbar_k = linearizedFmat(dt, Abar_k)
 
-    Fbar_k = expm(Abar_k*dt);
+    Fbar_k = eye(6) + dt*Abar_k;
 
 end

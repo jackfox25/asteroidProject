@@ -292,7 +292,7 @@
         hold on;
     end
     legend;
-    labels(gca,{'Time [s]','u [px]'},'Horizontal Pixel Position Error of Landmark #1')
+    labels(gca,{'Time [s]','u [px]'},'Horizontal Pixel Position Error of Landmark \#1')
     fixfig(u_fig);
     
    % Plot the landmark v pixel measurements
@@ -309,7 +309,7 @@
         hold on;
     end
     legend;
-    labels(gca,{'Time [s]','v [px]'},'Vertical Pixel Position Error of Landmark #1')
+    labels(gca,{'Time [s]','v [px]'},'Vertical Pixel Position Error of Landmark \#1')
     fixfig(v_fig);
     
     
