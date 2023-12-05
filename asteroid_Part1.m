@@ -203,48 +203,49 @@
         fixfig(evelStateHist);
     end
     
+    if true
+       % Position: [NOM + ERR] & [NL]
+        neposStateHist = figure;
+        
+        subplot(3,1,1);
+        plot(tspan,xbar(:,1)+x_nom(:,1),'Color',mlc(1),'DisplayName','$\delta x+x_{nom}$'); hold on;
+        plot(t_pert,x_pert(:,1),'--','Color','k','DisplayName','$x_{NL}$');
+        labels(gca,{'Time [s]','x [km]'},'Full-State Linear vs. Non-Linear Position History'); legend('interpreter','latex');
+        
+        subplot(3,1,2);
+        plot(tspan,xbar(:,2)+x_nom(:,2),'Color',mlc(2),'DisplayName','$\delta y+y_{nom}$'); hold on;
+        plot(t_pert,x_pert(:,2),'--','Color','k','DisplayName','$y_{NL}$');
+        labels(gca,{'Time [s]','y [km]'},''); legend('interpreter','latex');
+        
+        subplot(3,1,3);
+        plot(tspan,xbar(:,3)+x_nom(:,3),'Color',mlc(3),'DisplayName','$\delta z+z_{nom}$'); hold on;
+        plot(t_pert,x_pert(:,3),'--','Color','k','DisplayName','$z_{NL}$')
+        labels(gca,{'Time [s]','z [km]'},''); legend('interpreter','latex');
+        
+        fixfig(neposStateHist);
+        
+       % Velocity: [NOM + ERR] & [NL]
+        nevelStateHist = figure;
+        subplot(3,1,1);
+        plot(tspan,xbar(:,4)+x_nom(:,4),'Color',mlc(1),'DisplayName','$\delta \dot{x}+\dot{x}_{nom}$'); hold on;
+        plot(t_pert,x_pert(:,4),'--','Color','k','DisplayName','$\dot{x}_{NL}$');
+        labels(gca,{'Time [s]','$\mathrm{\dot{x}}$ [km/s]'},'Full-State Linear vs. Non-Linear Velocity History'); legend('interpreter','latex');
+        
+        subplot(3,1,2);
+        plot(tspan,xbar(:,5)+x_nom(:,5),'Color',mlc(2),'DisplayName','$\delta \dot{y}+\dot{y}_{nom}$'); hold on;
+        plot(t_pert,x_pert(:,5),'--','Color','k','DisplayName','$\dot{y}_{NL}$');
+        labels(gca,{'Time [s]','$\mathrm{\dot{y}}$ [km/s]'},''); legend('interpreter','latex');
+        
+        subplot(3,1,3);
+        plot(tspan,xbar(:,6)+x_nom(:,6),'Color',mlc(3),'DisplayName','$\delta \dot{z}+\dot{z}_{nom}$'); hold on;
+        plot(t_pert,x_pert(:,6),'--','Color','k','DisplayName','$\dot{z}_{NL}$');
+        labels(gca,{'Time [s]','$\mathrm{\dot{z}}$ [km/s]'},''); legend('interpreter','latex');
+        
+        fixfig(nevelStateHist);
+    end
     
-   % Position: [NOM + ERR] & [NL]
-    neposStateHist = figure;
     
-    subplot(3,1,1);
-    plot(tspan,xbar(:,1)+x_nom(:,1),'Color',mlc(1),'DisplayName','$\delta x+x_{nom}$'); hold on;
-    plot(t_pert,x_pert(:,1),'--','Color','k','DisplayName','$x_{NL}$');
-    labels(gca,{'Time [s]','x [km]'},'Full-State Linear vs. Non-Linear Position History'); legend('interpreter','latex');
-    
-    subplot(3,1,2);
-    plot(tspan,xbar(:,2)+x_nom(:,2),'Color',mlc(2),'DisplayName','$\delta y+y_{nom}$'); hold on;
-    plot(t_pert,x_pert(:,2),'--','Color','k','DisplayName','$y_{NL}$');
-    labels(gca,{'Time [s]','y [km]'},''); legend('interpreter','latex');
-    
-    subplot(3,1,3);
-    plot(tspan,xbar(:,3)+x_nom(:,3),'Color',mlc(3),'DisplayName','$\delta z+z_{nom}$'); hold on;
-    plot(t_pert,x_pert(:,3),'--','Color','k','DisplayName','$z_{NL}$')
-    labels(gca,{'Time [s]','z [km]'},''); legend('interpreter','latex');
-    
-    fixfig(neposStateHist);
-    
-   % Velocity: [NOM + ERR] & [NL]
-    nevelStateHist = figure;
-    subplot(3,1,1);
-    plot(tspan,xbar(:,4)+x_nom(:,4),'Color',mlc(1),'DisplayName','$\delta \dot{x}+\dot{x}_{nom}$'); hold on;
-    plot(t_pert,x_pert(:,4),'--','Color','k','DisplayName','$\dot{x}_{NL}$');
-    labels(gca,{'Time [s]','$\mathrm{\dot{x}}$ [km/s]'},'Full-State Linear vs. Non-Linear Velocity History'); legend('interpreter','latex');
-    
-    subplot(3,1,2);
-    plot(tspan,xbar(:,5)+x_nom(:,5),'Color',mlc(2),'DisplayName','$\delta \dot{y}+\dot{y}_{nom}$'); hold on;
-    plot(t_pert,x_pert(:,5),'--','Color','k','DisplayName','$\dot{y}_{NL}$');
-    labels(gca,{'Time [s]','$\mathrm{\dot{y}}$ [km/s]'},''); legend('interpreter','latex');
-    
-    subplot(3,1,3);
-    plot(tspan,xbar(:,6)+x_nom(:,6),'Color',mlc(3),'DisplayName','$\delta \dot{z}+\dot{z}_{nom}$'); hold on;
-    plot(t_pert,x_pert(:,6),'--','Color','k','DisplayName','$\dot{z}_{NL}$');
-    labels(gca,{'Time [s]','$\mathrm{\dot{z}}$ [km/s]'},''); legend('interpreter','latex');
-    
-    fixfig(nevelStateHist);
-    
-    
-   %% Simulate linearized measurements
+   % Simulate linearized measurements
     ybar = [];
 
     for t_k=obsvTimes
@@ -294,8 +295,9 @@
     legend;
     labels(gca,{'Time [s]','u [px]'},'Horizontal Pixel Position Error of Landmark \#1')
     fixfig(u_fig);
-    
-   % Plot the landmark v pixel measurements
+    set(gca,'XTick',0:10*3600:80*3600,'XLim',[0 80*3600]);
+
+   %% Plot the landmark v pixel measurements
     v_fig = figure; 
     for i = 1
         % Find rows where the second column is equal to i
@@ -311,7 +313,7 @@
     legend;
     labels(gca,{'Time [s]','v [px]'},'Vertical Pixel Position Error of Landmark \#1')
     fixfig(v_fig);
-    
+    set(gca,'XTick',0:10*3600:80*3600,'XLim',[0 80*3600],'YTick',-200:50:0,'YLim',[-200 0]);
     
     
     
