@@ -180,7 +180,7 @@
         eposStateHist = figure;
         subplot(3,1,1);
         plot(tspan,xbar(:,1),'Color',mlc(1),'DisplayName','$x$');
-        labels(gca,{'Time [s]','x [km]'},'Position Error State History');
+        labels(gca,{'Time [s]','x [km]'},'Position Error State History (DT, Linearized)');
         subplot(3,1,2);
         plot(tspan,xbar(:,2),'Color',mlc(2),'DisplayName','$y$');
         labels(gca,{'Time [s]','y [km]'},'');
@@ -193,7 +193,7 @@
         evelStateHist = figure;
         subplot(3,1,1);
         plot(tspan,xbar(:,4),'Color',mlc(1),'DisplayName','$\dot{x}$');
-        labels(gca,{'Time [s]','$\mathrm{\dot{x}}$ [km/s]'},'Velocity Error State History');
+        labels(gca,{'Time [s]','$\mathrm{\dot{x}}$ [km/s]'},'Velocity Error State History (DT, Linearized)');
         subplot(3,1,2);
         plot(tspan,xbar(:,5),'Color',mlc(2),'DisplayName','$\dot{y}$');
         labels(gca,{'Time [s]','$\mathrm{\dot{y}}$ [km/s]'},'');
@@ -292,7 +292,7 @@
         hold on;
     end
     legend;
-    labels(gca,{'Time [s]','u [px]'},'Horizontal Pixel Position Error of 1 Landmark')
+    labels(gca,{'Time [s]','u [px]'},'Horizontal Pixel Position Error of Landmark #1')
     fixfig(u_fig);
     
    % Plot the landmark v pixel measurements
@@ -309,7 +309,7 @@
         hold on;
     end
     legend;
-    labels(gca,{'Time [s]','v [px]'},'Vertical Pixel Position Error of 1 Landmark')
+    labels(gca,{'Time [s]','v [px]'},'Vertical Pixel Position Error of Landmark #1')
     fixfig(v_fig);
     
     
