@@ -29,8 +29,11 @@ end
 x_bar_LKF = zeros(length(tspan), 6); 
 P = zeros(6, 6, length(tspan));   
 % Set initial conditions
-x_bar_LKF(1, :) = xbar(1,:); 
+x_bar_LKF(1, :) = xbar(1,:); % Replace 'initial_state' with your actual initial state
 P(:, :, 1) = P0; % Use the provided initial covariance matrix P0
+
+% Extract unique time steps
+uniqueTimeSteps = unique(y_nom_tbl(:, 1));
 
 % Linearized Kalman Filter 
 for k = 1:length(tspan)-1  
@@ -40,7 +43,7 @@ for k = 1:length(tspan)-1
     P(:, :, k+1) = Fbar_k{k} * P(:, :, k) * Fbar_k{k}' + Q;
     
     % The measurement update occurs at every 10th k 
-    if mod(t_k,dt_obs) == 0 && t_k <= y_table(end,1)
+    if mod(t_k,dt_obs) == 0 &&
         y_full_k = y_full((y_full(:,1)==t_k)~=0,:); 
         y_table_k = y_table((y_table(:,1)==t_k)~=0,:); 
         y_trunc_k = []; 
@@ -76,8 +79,5 @@ for k = 1:length(tspan)-1
         
     end 
 end
-figure; 
-plot(tspan,x_bar_LKF(:,1)), hold on
-plot(tspan, xbar(:,1))
-legend()
+
 

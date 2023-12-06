@@ -26,7 +26,7 @@
     
    % Perfect measurement derivation
     y_nom_tbl = [];
-    y_full = []; 
+    
     obsvTimes = unique(y_table(:,1))';
     for t_k = obsvTimes % For each observation timestep
         
@@ -62,8 +62,7 @@
                              t_k i u_i v_i]; %#ok<*AGROW>   <--- suppresses size change warning
                 end
             end
-        
-            y_full = [y_full; t_k i u_i v_i]; % save all the meaurments sans the boolean condition (Part 2)
+    
         end
     
     end
@@ -248,8 +247,7 @@
     
    % Simulate linearized measurements
     ybar = [];
-
-
+    Fbar_k = cell(length(tspan) - 1, 1);
 
     for t_k=obsvTimes
         
@@ -271,14 +269,13 @@
 
        % Calculate CT jacobian, translate to DT
         Cbar_k = linearizedCmat(f, R_CtoN_k, pos_lmks_N, y_nom_tbl_k, x_nom_k);
-        Hbar_k = linearizedHmat(Cbar_k);
+        Hbar_k{t_k} = linearizedHmat(Cbar_k);
 
         ybar_k = Hbar_k*xbar_k;
         ybar_k = reshape(ybar_k,[2,length(ybar_k)/2])';
 
         ybar = [ybar; ybar_k];
         
-
     end
     
     ybar_tbl = [y_nom_tbl(:,1:2) ybar];
