@@ -1,11 +1,15 @@
-function fixfig(f)
+function fixfig(f, varargin)
 
     fontname = 'Times New Roman'; % leave alone.
     fontsize = 16;                % scale up or down as necessary.
     legloc = 'northeast';         % 'northwest', 'southeast', etc. legend can also be dragged after plot is created.
-    linewidth = 2.5;                % scale up or down as necessary.
+    linewidth = 2.5;              % scale up or down as necessary.
     marker = [];                  % replace brackets with '.', 'o', 'x' etc. to change the marker for each point. brackets leaves it alone.
     markersize = [];              % scale up or down as necessary.
+
+    if ~isempty(varargin)
+        linewidth = [];
+    end    
 
     for i=1:length(f.Children)
         if isa(f.Children(i),'matlab.graphics.illustration.Legend')
