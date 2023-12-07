@@ -2,8 +2,11 @@ asteroid_Part1;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%% PART 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 
-NMC = 1; % # of Monte-Carlo simulations
+NMC = 1;            % # of Monte-Carlo simulations (MAX 25)
 
+PLOTFLAG = true;    % decide whether to produce plots or not
+
+load('x_noisy_MC25.mat');
 
 % -- Process noise covariance matrix 
  Q = sigma_w^2*[dt_int^3/3*eye(3)    dt_int^2/2*eye(3);...
@@ -32,15 +35,8 @@ for mc=1:NMC
    % ---------------------------------------------------------
    % Generate noisy truth state
    % ---------------------------------------------------------
-    x_noisy = zeros(length(tspan),6);
-    x_noisy(1,:) = x0';
-    tic;
-    for t_k = t0+dt_int:dt_int:tf_int
-        processNoise = sigma_w^2*randn(3,1);
-        [t_noisy_k,x_noisy_k] = ode45(@(t,x) satDynamicModel(t,x,[],processNoise),[t_k-dt_int t_k],x_noisy(t_k/dt_int,:)',OPTIONS); 
-        x_noisy(t_k/dt_int+1,:) = x_noisy_k(end,:);
-    end
-    toc;
+    x_noisy = x_noisy_MC25(:,:,mc);
+
    % --------------------------------------------------------- 
    % Generate noisy measurements from noisy truth state
    % ---------------------------------------------------------

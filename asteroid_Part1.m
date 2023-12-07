@@ -8,7 +8,7 @@
     clear; clc; close all;
     addpath('toolbox');
     
-    PLOTFLAG = true;
+    PLOTFLAG = true; % decide whether to produce plots or not
 
    % Load data and parameters
     load('orbitdetermination-finalproj_data_2023_11_14.mat');
