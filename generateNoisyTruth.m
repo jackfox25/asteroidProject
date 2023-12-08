@@ -1,9 +1,18 @@
+% =================================================================================================
+% Script: generateNoisyTruth
+% Pre-generates realizations of noisy state date for asteroid project.
+% =================================================================================================
+% Parameters:
+%        Nsets   number of sets to generate
+%     saveFile   .mat filename to save out datasets
+% =================================================================================================
+
 asteroid_Part1;
 
-%%
 Nsets = 25;
+saveFile = "x_noisy_MC25"; % do not put .mat here, gets added later
 
-x_noisy_MC25 = zeros(length(tspan),6,Nsets);
+x_noisy_MC = zeros(length(tspan),6,Nsets);
 
 % Configure tolerances
 tol=1.e-8;
@@ -23,9 +32,18 @@ fprintf('Generating set  %d\n',i);
         x_noisy(t_k/dt_int+1,:) = x_noisy_k(end,:);
     end
 
-    x_noisy_MC25(:,:,i) = x_noisy;
+    x_noisy_MC(:,:,i) = x_noisy;
 
 toc;
 
 end
 
+% make sure existing datasets are not overwritten
+counter = 1;
+saveFileOrig = saveFile;
+while isfile(saveFile)
+    saveFile = saveFileOrig + sprintf("_%d",counter) + ".mat";
+    counter = counter + 1;
+end
+
+save(saveFile,'x_noisy_MC');
