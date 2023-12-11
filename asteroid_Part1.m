@@ -34,11 +34,10 @@
         
        % Recover s/c position vector, define khatC vector (cam nadir pointing)
         satpos_k_N = x_nom((t_nom==t_k)~=0,1:3)';    % satellite position in inertial frame
-        khatC_k_N = -satpos_k_N/norm(satpos_k_N);    % unit vector of camera pointing axis in inertial frame
         
        % Get rotation matrix R_CtoN
         R_CtoN_k = R_CtoN(:,:,(t_k/dt_obs)+1);
-        ihatC_k_N = R_CtoN_k(:,1); jhatC_k_N = R_CtoN_k(:,2);
+        ihatC_k_N = R_CtoN_k(:,1); jhatC_k_N = R_CtoN_k(:,2); khatC_k_N = R_CtoN_k(:,3);
     
        % Get rotation matrix R_AtoN
         theta = w_A*t_k;
