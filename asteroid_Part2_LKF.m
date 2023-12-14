@@ -2,13 +2,13 @@ asteroid_Part1;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%% PART 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 
-    NMC = 1;            % # of Monte-Carlo simulations (MAX 25)
+    NMC = 50;            % # of Monte-Carlo simulations
     PLOTFLAG = true;    % decide whether to produce plots or not
     
-    load('x_noisy_MC40.mat');
+    load('x_noisy_MC50_0p01.mat');
     
    % -- Process noise covariance matrix
-     Qfactor = 1;
+     Qfactor = 0.05;
      Q = Qfactor * sigma_w^2*[dt_int^3/3*eye(3)    dt_int^2/2*eye(3);...
                               dt_int^2/2*eye(3)    dt_int*eye(3)];
 
@@ -18,7 +18,8 @@ asteroid_Part1;
      P0 = blkdiag(P0pos,P0vel);
 
    % -- Measurement noise covariance matrix (for each landmark)
-     R = 1*diag([sigma_u^2 sigma_v^2]);
+     Rfactor = 1;
+     R = Rfactor*diag([sigma_u^2 sigma_v^2]);
     
     
    % Pre-compute Fbar matrices for DT state propagation
@@ -93,8 +94,9 @@ asteroid_Part1;
             end
         end
         
-    
-    
+        %y_noisy_tbl = y_table;
+        %x_noisy = x_nom;
+
        % ---------------------------------------------------------------------------------------------------------------- 
        % LINEARIZED KALMAN FILTER
        % ----------------------------------------------------------------------------------------------------------------
@@ -164,7 +166,7 @@ asteroid_Part1;
     
            % Calculate and save NEES/NIS
             S_kp1 = (Hbar_kp1 * P(:,:,(k+1)+1) * Hbar_kp1' + Big_R);
-            [NEES_kp1, NIS_kp1] = calculateNEESNIS(x_bar_LKF((k+1)+1,:)', y_bar_kp1, P(:,:,(k+1)+1), S_kp1, alpha, NMC);
+            [NEES_kp1, NIS_kp1] = calculateNEESNIS(x_bar_LKF((k+1)+1,:)' - (x_noisy((k+1)+1,:)'-x_nom((k+1)+1,:)'), y_bar_kp1, P(:,:,(k+1)+1), S_kp1, alpha, NMC);
             
             NEES((k+1)+1,mc) = NEES_kp1.NEES; NEESr1((k+1)+1,mc) = NEES_kp1.r1; NEESr2((k+1)+1,mc) = NEES_kp1.r2;
             if size(y_noisy_kp1,1) > 0
@@ -196,21 +198,21 @@ asteroid_Part1;
         % Position error and +-2sigma (single plot)
         figure(51); movefig(gcf,'r');
         subplot(3,1,1); hold off;
-        plot(tspan,x_bar_LKF(:,1),'DisplayName','$\bar{x}$','Color',mlc(1),'LineWidth',2); hold on;
+        plot(tspan,x_bar_LKF(:,1) - (x_noisy(:,1)-x_nom(:,1)),'DisplayName','$\bar{x}$','Color',mlc(1),'LineWidth',2); hold on;
         plot(tspan,2*sqrt(squeeze(P(1,1,:))),'k--','DisplayName','$\pm2\sigma$','LineWidth',1.5);
         plot(tspan,-2*sqrt(squeeze(P(1,1,:))),'k--','LineWidth',1.5,'HandleVisibility','off');
         labels(gca,{'Time [s]','$\bar{x}$ [km]'},'');
         %set(gca,'YLim',[-0.002 0.002]); legend('interpreter','latex');
         
         subplot(3,1,2); hold off;
-        plot(tspan,x_bar_LKF(:,2),'DisplayName','$\bar{y}$','Color',mlc(2),'LineWidth',2); hold on;
+        plot(tspan,x_bar_LKF(:,2) - (x_noisy(:,2)-x_nom(:,2)),'DisplayName','$\bar{y}$','Color',mlc(2),'LineWidth',2); hold on;
         plot(tspan,2*sqrt(squeeze(P(2,2,:))),'k--','DisplayName','$\pm2\sigma$','LineWidth',1.5);
         plot(tspan,-2*sqrt(squeeze(P(2,2,:))),'k--','LineWidth',1.5,'HandleVisibility','off');
         labels(gca,{'Time [s]','$\bar{y}$ [km]'},'');
         %set(gca,'YLim',[-0.006 0.006]); legend('interpreter','latex');
         
         subplot(3,1,3); hold off;
-        plot(tspan,x_bar_LKF(:,3),'DisplayName','$\bar{z}$','Color',mlc(3),'LineWidth',2); hold on;
+        plot(tspan,x_bar_LKF(:,3) - (x_noisy(:,3)-x_nom(:,3)),'DisplayName','$\bar{z}$','Color',mlc(3),'LineWidth',2); hold on;
         plot(tspan,2*sqrt(squeeze(P(3,3,:))),'k--','DisplayName','$\pm2\sigma$','LineWidth',1.5);
         plot(tspan,-2*sqrt(squeeze(P(3,3,:))),'k--','LineWidth',1.5,'HandleVisibility','off');
         labels(gca,{'Time [s]','$\bar{z}$ [km]'},'');
@@ -220,21 +222,21 @@ asteroid_Part1;
         % Velocity error and +-2sigma (single plot)
         figure(52); movefig(gcf,'r');
         subplot(3,1,1); hold off;
-        plot(tspan,x_bar_LKF(:,4),'DisplayName','$\bar{\dot{x}}$','Color',mlc(1),'LineWidth',2); hold on;
+        plot(tspan,x_bar_LKF(:,4) - (x_noisy(:,4)-x_nom(:,4)),'DisplayName','$\bar{\dot{x}}$','Color',mlc(1),'LineWidth',2); hold on;
         plot(tspan,2*sqrt(squeeze(P(4,4,:))),'k--','DisplayName','$\pm2\sigma$','LineWidth',1.5);
         plot(tspan,-2*sqrt(squeeze(P(4,4,:))),'k--','LineWidth',1.5,'HandleVisibility','off');
         labels(gca,{'Time [s]','$\bar{\dot{x}}$ [km/s]'},'');
         %set(gca,'YLim',[-0.000001 0.000001]); legend('interpreter','latex');
         
         subplot(3,1,2); hold off;
-        plot(tspan,x_bar_LKF(:,5),'DisplayName','$\bar{\dot{y}}$','Color',mlc(2),'LineWidth',2); hold on;
+        plot(tspan,x_bar_LKF(:,5) - (x_noisy(:,5)-x_nom(:,5)),'DisplayName','$\bar{\dot{y}}$','Color',mlc(2),'LineWidth',2); hold on;
         plot(tspan,2*sqrt(squeeze(P(5,5,:))),'k--','DisplayName','$\pm2\sigma$','LineWidth',1.5);
         plot(tspan,-2*sqrt(squeeze(P(5,5,:))),'k--','LineWidth',1.5,'HandleVisibility','off');
         labels(gca,{'Time [s]','$\bar{\dot{y}}$ [km/s]'},'');
         %set(gca,'YLim',[-0.000001 0.000001]); legend('interpreter','latex');
         
         subplot(3,1,3); hold off;
-        plot(tspan,x_bar_LKF(:,6),'DisplayName','$\bar{\dot{z}}$','Color',mlc(3),'LineWidth',2); hold on;
+        plot(tspan,x_bar_LKF(:,6) - (x_noisy(:,6)-x_nom(:,6)),'DisplayName','$\bar{\dot{z}}$','Color',mlc(3),'LineWidth',2); hold on;
         plot(tspan,2*sqrt(squeeze(P(6,6,:))),'k--','DisplayName','$\pm2\sigma$','LineWidth',1.5);
         plot(tspan,-2*sqrt(squeeze(P(6,6,:))),'k--','LineWidth',1.5,'HandleVisibility','off');
         labels(gca,{'Time [s]','$\bar{\dot{z}}$ [km/s]'},'');

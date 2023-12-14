@@ -1,4 +1,4 @@
-load('x_noisy_MC40.mat');
+load('x_noisy_MC50_0p01.mat');
 
 ff = figure(1); hold off; clf;
 plt0 = plot3(x_nom(1,1),x_nom(1,2),x_nom(1,3),'Color',0.7*mlc(1)); hold on;

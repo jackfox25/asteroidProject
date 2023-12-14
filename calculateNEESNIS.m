@@ -23,7 +23,7 @@ function [NEES, NIS] = calculateNEESNIS(x_bar_k, y_bar_k, P_kp, S, alpha, NMC)
     NEES.NEES = x_bar_k' / P_kp * x_bar_k;
 
     % Calculate the NIS statistic scalar 
-    NIS.NIS = y_bar_k' / S * y_bar_k;
+    NIS.NIS = y_bar_k' / S * y_bar_k / (p/2);
 
     % Calculate bounds for the NEES 
     NEES.r1 = chi2inv(alpha/2, NMC*n) / NMC;
